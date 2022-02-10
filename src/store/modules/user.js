@@ -28,8 +28,9 @@ const mutations = {
 }
 
 const actions = {
-  // user login
+  //这里在处理登录业务
   login({ commit }, userInfo) {
+    //解构出用户名与密码
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
