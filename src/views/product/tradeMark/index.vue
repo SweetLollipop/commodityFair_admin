@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- 按钮 -->
-        <el-button type="primary" icon="el-icon-plus" style="marigin:10px 0px">添加</el-button>
+        <el-button type="primary" icon="el-icon-plus" style="marigin:10px 0px" @click="showDialog">添加</el-button>
         <!-- 表格组件
             data: 表格组件将来需要展示的数据---数组类型
             border: 是给表格添加边框
@@ -36,7 +36,7 @@
                 label="操作"
                 align="center">
                 <template slot-scope="">
-                    <el-button type="warning" icon="el-icon-edit" size="mini">修改</el-button>
+                    <el-button type="warning" icon="el-icon-edit" size="mini" @click="updateTradeMark">修改</el-button>
                     <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
                 </template>
             </el-table-column>
@@ -62,6 +62,36 @@
             layout="prev, pager, next, jumper, ->, sizes, total"
         >
         </el-pagination>
+        <!-- 对话框
+            :visible.sync  控制对话框显示或隐藏用的
+        -->
+        <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
+            <!-- form表单 -->
+            <el-form style="width:80%">
+                <el-form-item label="品牌名称" :label-width="100">
+                    <el-input autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="品牌LOGO" :label-width="100">
+                    <!-- :on-success="handleAvatarSuccess" 图片上传之后的回调
+                      :before-upload="beforeAvatarUpload" 图片上传之前的回调-->
+                    <el-upload
+                      class="avatar-uploader"
+                      action="https://jsonplaceholder.typicode.com/posts/"
+                      :show-file-list="false"
+                      :on-success="handleAvatarSuccess"
+                      :before-upload="beforeAvatarUpload"
+                    >
+                        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                    </el-upload>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -75,6 +105,8 @@
                 limit: 3, //当前页数展示数据条数
                 total: 0, //总数据条数
                 list: [], //列表展示的数据
+                dialogFormVisible: false,  //对话框显示或隐藏控制的属性
+                imageUrl: '', //上传图片使用的属性
             }
         },
         mounted(){
@@ -102,11 +134,58 @@
             handleSizeChange(limit){
                 this.limit = limit //修改参数
                 this.getPageList() //再调请求
-            }
+            },
+            //点击添加品牌的按钮
+            showDialog(){
+                this.dialogFormVisible = true //显示对话框
+            },
+            //点击修改品牌的按钮
+            updateTradeMark(){
+                this.dialogFormVisible = true //显示对话框
+            },
+            //上传图片后的回调
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = URL.createObjectURL(file.raw);
+            },
+            //上传图片前的回调
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            },
         }
     }
 </script>
 
 <style>
-
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>
