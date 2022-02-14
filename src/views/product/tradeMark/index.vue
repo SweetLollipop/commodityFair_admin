@@ -66,22 +66,26 @@
             :visible.sync  控制对话框显示或隐藏用的
         -->
         <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
-            <!-- form表单 -->
-            <el-form style="width:80%">
-                <el-form-item label="品牌名称" :label-width="100">
-                    <el-input autocomplete="off"></el-input>
+            <!-- form表单 :model属性（把表单的数据收集到tmForm对象身上，用于获取输入、表单验证）-->
+            <el-form style="width:80%" :model="tmForm">
+                <el-form-item label="品牌名称" label-width="100px">
+                    <el-input autocomplete="off" v-model="tmForm.tmName"></el-input>
                 </el-form-item>
-                <el-form-item label="品牌LOGO" :label-width="100">
-                    <!-- :on-success="handleAvatarSuccess" 图片上传之后的回调
-                      :before-upload="beforeAvatarUpload" 图片上传之前的回调-->
+                <el-form-item label="品牌LOGO" label-width="100px">
+                    <!-- 
+                      这里收集数据不能使用v-model,因为不是表单元素
+                      action:设置图片上传的地址/admin/product/fileUpload
+                      :on-success="handleAvatarSuccess" 图片上传成功之后的回调,执行一次
+                      :before-upload="beforeAvatarUpload" 图片上传之前的回调，执行一次
+                    -->
                     <el-upload
                       class="avatar-uploader"
-                      action="https://jsonplaceholder.typicode.com/posts/"
+                      action="/dev-api/admin/product/fileUpload"
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :before-upload="beforeAvatarUpload"
                     >
-                        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                        <img v-if="tmForm.logoUrl" :src="tmForm.logoUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
                     </el-upload>
@@ -89,7 +93,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                <el-button type="primary" @click="addOrUpdateTradeMark">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -106,7 +110,10 @@
                 total: 0, //总数据条数
                 list: [], //列表展示的数据
                 dialogFormVisible: false,  //对话框显示或隐藏控制的属性
-                imageUrl: '', //上传图片使用的属性
+                tmForm: {
+                    logoUrl: '', //品牌LOGO
+                    tmName: '',  //品牌名称
+                }
             }
         },
         mounted(){
@@ -138,14 +145,17 @@
             //点击添加品牌的按钮
             showDialog(){
                 this.dialogFormVisible = true //显示对话框
+                this.tmForm = {tmName: '', logoUrl: ''} //填写之前清空数据
             },
             //点击修改品牌的按钮
             updateTradeMark(){
                 this.dialogFormVisible = true //显示对话框
             },
-            //上传图片后的回调
+            //上传图片成功后的回调
             handleAvatarSuccess(res, file) {
-                this.imageUrl = URL.createObjectURL(file.raw);
+                //res:上传成功后返回给前端的地址，file：上传成功后服务器返回的数据  
+                // console.log(file)
+                this.tmForm.logoUrl = res.data
             },
             //上传图片前的回调
             beforeAvatarUpload(file) {
@@ -159,6 +169,15 @@
                 this.$message.error('上传头像图片大小不能超过 2MB!');
                 }
                 return isJPG && isLt2M;
+            },
+            //添加品牌或修改品牌
+            async addOrUpdateTradeMark(){
+                this.dialogFormVisible = false //对话框隐藏
+                let result = await this.$API.trademark.reqAddOrUpdateTradeMark(this.tmForm)
+                if(result === 200){
+                    this.$message(this.tmForm.id ? '修改品牌成功' : '添加品牌成功')  //弹出信息
+                    this.getPageList()  //添加或修改成功后，再次获取列表进行展示
+                }
             },
         }
     }
