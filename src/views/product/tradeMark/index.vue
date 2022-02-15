@@ -35,8 +35,8 @@
                 prop="operation"
                 label="操作"
                 align="center">
-                <template slot-scope="">
-                    <el-button type="warning" icon="el-icon-edit" size="mini" @click="updateTradeMark">修改</el-button>
+                <template slot-scope="{row}">
+                    <el-button type="warning" icon="el-icon-edit" size="mini" @click="updateTradeMark(row)">修改</el-button>
                     <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
                 </template>
             </el-table-column>
@@ -65,7 +65,7 @@
         <!-- 对话框
             :visible.sync  控制对话框显示或隐藏用的
         -->
-        <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
+        <el-dialog :title="this.tmForm.id ? '修改品牌' : '添加品牌'" :visible.sync="dialogFormVisible">
             <!-- form表单 :model属性（把表单的数据收集到tmForm对象身上，用于获取输入、表单验证）-->
             <el-form style="width:80%" :model="tmForm">
                 <el-form-item label="品牌名称" label-width="100px">
@@ -87,7 +87,7 @@
                     >
                         <img v-if="tmForm.logoUrl" :src="tmForm.logoUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件,且不超过500kb</div>
                     </el-upload>
                 </el-form-item>
             </el-form>
@@ -148,8 +148,14 @@
                 this.tmForm = {tmName: '', logoUrl: ''} //填写之前清空数据
             },
             //点击修改品牌的按钮
-            updateTradeMark(){
+            updateTradeMark(row){
                 this.dialogFormVisible = true //显示对话框
+                // console.log(row)  //row: 当前用户选中将修改的品牌信息
+                //将服务器返回的品牌信息，直接赋值给了tmForm进行展示。
+                //也就是tmForm存储即为服务器返回的品牌信息
+                // this.tmForm = row  //将已有的品牌信息赋值给tmForm进行展示
+                this.tmForm = {...row}  //具体效果是将row对象的属性进行浅层拷贝（克隆）
+                // console.log(this.tmForm)
             },
             //上传图片成功后的回调
             handleAvatarSuccess(res, file) {
@@ -174,12 +180,17 @@
             async addOrUpdateTradeMark(){
                 this.dialogFormVisible = false //对话框隐藏
                 let result = await this.$API.trademark.reqAddOrUpdateTradeMark(this.tmForm)
-                if(result === 200){
-                    this.$message(this.tmForm.id ? '修改品牌成功' : '添加品牌成功')  //弹出信息
-                    this.getPageList()  //添加或修改成功后，再次获取列表进行展示
+                if(result.code === 200){
+                    /* this.$message({
+                        type: 'success',
+                        message: this.tmForm.id ? '修改品牌成功' : '添加品牌成功'
+                    })  //弹出信息 */
+                    this.$message.success(this.tmForm.id ? '修改品牌成功' : '添加品牌成功')  //弹出信息
+                    //如果是添加品牌，停留在第一页，修改品牌应该停留在当前页面
+                    this.getPageList(this.tmForm.id ? this.page : 1)  //添加或修改成功后，再次获取列表进行展示
                 }
             },
-        }
+        },
     }
 </script>
 
