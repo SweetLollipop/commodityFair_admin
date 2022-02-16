@@ -37,7 +37,7 @@
                 align="center">
                 <template slot-scope="{row}">
                     <el-button type="warning" icon="el-icon-edit" size="mini" @click="updateTradeMark(row)">修改</el-button>
-                    <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+                    <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteTradeMark(row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -118,6 +118,7 @@
                 page: 1, //分页器第几页
                 limit: 3, //当前页数展示数据条数
                 total: 0, //总数据条数
+                pages: 1, //总页数
                 list: [], //列表展示的数据
                 dialogFormVisible: false,  //对话框显示或隐藏控制的属性
                 tmForm: {
@@ -150,6 +151,7 @@
                 if(result.code === 200){
                     this.total = result.data.total
                     this.list = result.data.records
+                    this.pages = result.data.pages
                 }
             },
             //点击页码按钮
@@ -209,8 +211,8 @@
                                 message: this.tmForm.id ? '修改品牌成功' : '添加品牌成功'
                             })  //弹出信息 */
                             this.$message.success(this.tmForm.id ? '修改品牌成功' : '添加品牌成功')  //弹出信息
-                            //如果是添加品牌，停留在第一页，修改品牌应该停留在当前页面
-                            this.getPageList(this.tmForm.id ? this.page : 1)  //添加或修改成功后，再次获取列表进行展示
+                            //如果是添加品牌，跳转到最后一页，修改品牌应该停留在当前页面
+                            this.getPageList(this.tmForm.id ? this.page : this.total%this.limit===0 ? this.pages+1 : this.pages)  //添加或修改成功后，再次获取列表进行展示
                         }
                     } else {
                         console.log('error submit!!');
@@ -218,6 +220,29 @@
                     }
                 })
             },
+            //删除品牌的操作
+            deleteTradeMark(row){
+                this.$confirm(`您确定删除${row.tmName}吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async() => {
+                    let result = await this.$API.trademark.reqDeleteTradeMark(row.id)
+                    if(result.code === 200){  //删除成功
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        this.getPageList(this.list.length>1 ? this.page : this.page-1)  //删除成功后，再次获取列表进行展示
+                    }
+                    
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });          
+                });
+            }
         },
     }
 </script>
