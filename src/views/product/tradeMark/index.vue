@@ -64,14 +64,16 @@
         </el-pagination>
         <!-- 对话框
             :visible.sync  控制对话框显示或隐藏用的
+            Form 组件提供了表单验证的功能，只需要通过 rules 属性传入约定的验证规则，并将 Form-Item 的 prop 
+            属性设置为需校验的字段名即可
         -->
         <el-dialog :title="this.tmForm.id ? '修改品牌' : '添加品牌'" :visible.sync="dialogFormVisible">
             <!-- form表单 :model属性（把表单的数据收集到tmForm对象身上，用于获取输入、表单验证）-->
-            <el-form style="width:80%" :model="tmForm">
-                <el-form-item label="品牌名称" label-width="100px">
+            <el-form style="width:80%" :model="tmForm" :rules="rules" ref="ruleForm">
+                <el-form-item label="品牌名称" label-width="100px" prop="tmName">
                     <el-input autocomplete="off" v-model="tmForm.tmName"></el-input>
                 </el-form-item>
-                <el-form-item label="品牌LOGO" label-width="100px">
+                <el-form-item label="品牌LOGO" label-width="100px" prop="logoUrl">
                     <!-- 
                       这里收集数据不能使用v-model,因为不是表单元素
                       action:设置图片上传的地址/admin/product/fileUpload
@@ -104,6 +106,14 @@
         name: 'tradeMark',
         //组件挂载后发请求
         data(){
+            //自定义校验规则
+            var validateTmName = (rule, value, callback) => {
+                if (value.length<2 || value.length>10) {
+                callback(new Error('品牌名称2-10位'));
+                } else {
+                callback();
+                }
+            };
             return{
                 page: 1, //分页器第几页
                 limit: 3, //当前页数展示数据条数
@@ -113,6 +123,16 @@
                 tmForm: {
                     logoUrl: '', //品牌LOGO
                     tmName: '',  //品牌名称
+                },
+                rules: {  //表单验证的规则
+                    tmName: [  //品牌名称的验证规则 blur：失去焦点  change：文本改变
+                        { required: true, message: '请输入品牌名称', trigger: 'blur' },
+                        // { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'change' }
+                        { validator: validateTmName, trigger: 'change' }
+                    ],
+                    logoUrl: [  //品牌LOGO验证规则
+                        { required: true, message: '请选择品牌图片' }
+                    ],
                 }
             }
         },
@@ -177,18 +197,26 @@
                 return isJPG && isLt2M;
             },
             //添加品牌或修改品牌
-            async addOrUpdateTradeMark(){
-                this.dialogFormVisible = false //对话框隐藏
-                let result = await this.$API.trademark.reqAddOrUpdateTradeMark(this.tmForm)
-                if(result.code === 200){
-                    /* this.$message({
-                        type: 'success',
-                        message: this.tmForm.id ? '修改品牌成功' : '添加品牌成功'
-                    })  //弹出信息 */
-                    this.$message.success(this.tmForm.id ? '修改品牌成功' : '添加品牌成功')  //弹出信息
-                    //如果是添加品牌，停留在第一页，修改品牌应该停留在当前页面
-                    this.getPageList(this.tmForm.id ? this.page : 1)  //添加或修改成功后，再次获取列表进行展示
-                }
+            addOrUpdateTradeMark(){
+                //当全部的字段验证通过之后，再发请求
+                this.$refs.ruleForm.validate(async (success)=>{
+                    if (success) {  //如果全部字段符合条件
+                        this.dialogFormVisible = false //对话框隐藏
+                        let result = await this.$API.trademark.reqAddOrUpdateTradeMark(this.tmForm)
+                        if(result.code === 200){
+                            /* this.$message({
+                                type: 'success',
+                                message: this.tmForm.id ? '修改品牌成功' : '添加品牌成功'
+                            })  //弹出信息 */
+                            this.$message.success(this.tmForm.id ? '修改品牌成功' : '添加品牌成功')  //弹出信息
+                            //如果是添加品牌，停留在第一页，修改品牌应该停留在当前页面
+                            this.getPageList(this.tmForm.id ? this.page : 1)  //添加或修改成功后，再次获取列表进行展示
+                        }
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                })
             },
         },
     }
