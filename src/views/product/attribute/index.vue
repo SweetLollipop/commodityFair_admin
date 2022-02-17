@@ -1,15 +1,17 @@
 <template>
-    <div>
-        attribute
-    </div>
+  <div>
+    <el-card style="margin: 20px 0px">
+      <CategorySelect />
+    </el-card>
+    <el-card> </el-card>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: 'attribute',
-    }
+export default {
+  name: "attribute",
+};
 </script>
 
 <style>
-
 </style>
