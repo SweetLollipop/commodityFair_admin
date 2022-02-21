@@ -6,7 +6,7 @@ import request from '@/utils/request'
     接口: /admin/product/getCategory1
     请求类型：get
 */
-export const reqCategory1List = ()=>request({
+export const reqCategory1List = () => request({
     url: '/admin/product/getCategory1',
     method: 'get',
 })
@@ -15,7 +15,7 @@ export const reqCategory1List = ()=>request({
     接口: /admin/product/getCategory2/{category1Id}
     请求类型：get
 */
-export const reqCategory2List = (category1Id)=>request({
+export const reqCategory2List = (category1Id) => request({
     url: `/admin/product/getCategory2/${category1Id}`,
     method: 'get',
 })
@@ -24,8 +24,16 @@ export const reqCategory2List = (category1Id)=>request({
     接口: /admin/product/getCategory3/{category2Id}
     请求类型：get
 */
-export const reqCategory3List = (category2Id)=>request({
+export const reqCategory3List = (category2Id) => request({
     url: `/admin/product/getCategory3/${category2Id}`,
     method: 'get',
 })
-
+/* 
+    获取平台属性接口
+    接口：/admin/product/attrInfoList/{category1Id}/{category2Id}/{category3Id}
+    请求类型：get
+*/
+export const reqAttributeList = (category1Id, category2Id, category3Id) => request({
+    url: `/admin/product/attrInfoList/${category1Id}/${category2Id}/${category3Id}`,
+    method: 'get',
+})
