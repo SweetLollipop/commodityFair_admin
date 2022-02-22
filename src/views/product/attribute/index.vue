@@ -4,9 +4,16 @@
       <CategorySelect @getCategoryId="getCategoryId" />
     </el-card>
     <el-card>
-      <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
-      <!-- 表格：展示平台属性 -->
-      <template>
+      <!-- 展示属性的结构 -->
+      <diV v-show="isShowTable">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          :disabled="!category3Id"
+          @click="isShowTable = false"
+          >添加属性</el-button
+        >
+        <!-- 表格：展示平台属性 -->
         <el-table :data="attributeList" style="width: 100%" border>
           <el-table-column type="index" label="序号" width="80" align="center">
           </el-table-column>
@@ -24,13 +31,47 @@
             </template>
           </el-table-column>
           <el-table-column prop="address" label="操作" width="150">
-            <template slot-scope="{row,$index}">
-              <el-button type="warning" icon="el-icon-edit" size="mini"></el-button>
-              <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <template slot-scope="{ row, $index }">
+              <el-button
+                type="warning"
+                icon="el-icon-edit"
+                size="mini"
+                @click="isShowTable = false"
+              ></el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+              ></el-button>
             </template>
           </el-table-column>
         </el-table>
-      </template>
+      </diV>
+      <!-- 添加属性|修改属性的结构 -->
+      <div v-show="!isShowTable">
+        <el-form :inline="true" ref="from" label-width="80px">
+          <el-form-item label="属性名称">
+            <el-input placeholder="请输入属性名称"></el-input>
+          </el-form-item>
+        </el-form>
+        <el-button type="primary" icon="el-icon-plus">添加属性值</el-button>
+        <el-button @click="isShowTable = true">取消</el-button>
+        <el-table style="width: 100%; margin: 20px 0px" border>
+          <el-table-column
+            type="index"
+            label="序号"
+            width="80px"
+            align="center"
+          >
+          </el-table-column>
+          <el-table-column prop="prop" label="属性值名称" width="width">
+          </el-table-column>
+          <el-table-column prop="prop" label="操作" width="width">
+          </el-table-column>
+        </el-table>
+        <el-button type="primary">保存</el-button>
+        <el-button @click="isShowTable = true">取消</el-button>
+      </div>
     </el-card>
   </div>
 </template>
@@ -44,6 +85,7 @@ export default {
       category2Id: "",
       category3Id: "",
       attributeList: [], //接收平台属性的字段
+      isShowTable: false, //控制table表格的显示与隐藏
     };
   },
   methods: {
