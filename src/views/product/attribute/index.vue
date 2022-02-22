@@ -62,9 +62,19 @@
             ></el-input>
           </el-form-item>
         </el-form>
-        <el-button type="primary" icon="el-icon-plus">添加属性值</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          @click="addAttributeValue"
+          :disabled="!attributeInfo.attrName"
+          >添加属性值</el-button
+        >
         <el-button @click="isShowTable = true">取消</el-button>
-        <el-table style="width: 100%; margin: 20px 0px" border>
+        <el-table
+          style="width: 100%; margin: 20px 0px"
+          border
+          :data="attributeInfo.attrValueList"
+        >
           <el-table-column
             type="index"
             label="序号"
@@ -73,8 +83,22 @@
           >
           </el-table-column>
           <el-table-column prop="prop" label="属性值名称" width="width">
+            <template slot-scope="{ row, $index }">
+              <el-input
+                placeholder="请输入属性值名称"
+                v-model="row.valueName"
+                size="mini"
+              ></el-input>
+            </template>
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
+            <template slot-scope="{ row, $index }">
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+              ></el-button>
+            </template>
           </el-table-column>
         </el-table>
         <el-button type="primary">保存</el-button>
@@ -98,10 +122,10 @@ export default {
       attributeInfo: {
         attrName: "",
         attrValueList: [
-          {
+          /* {
             attrId: 0,
             valueName: "",
-          },
+          }, */
         ],
         categoryId: 0,
         categoryLevel: 3,
@@ -138,6 +162,14 @@ export default {
       if (result.code === 200) {
         this.attributeList = result.data;
       }
+    },
+    //添加属性值
+    addAttributeValue() {
+      //向属性值的数组里面添加元素
+      this.attributeInfo.attrValueList.push({
+        attrId: undefined, //相应属性的id
+        valueName: "", //相应属性值名称
+      });
     },
   },
 };
