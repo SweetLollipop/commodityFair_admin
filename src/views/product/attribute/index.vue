@@ -10,7 +10,7 @@
           type="primary"
           icon="el-icon-plus"
           :disabled="!category3Id"
-          @click="isShowTable = false"
+          @click="addAttribute"
           >添加属性</el-button
         >
         <!-- 表格：展示平台属性 -->
@@ -170,6 +170,22 @@ export default {
         attrId: undefined, //相应属性的id
         valueName: "", //相应属性值名称
       });
+    },
+    //添加属性
+    addAttribute() {
+      this.isShowTable = false; //切换table显示与隐藏
+      //清除数据
+      this.attributeInfo = {
+        attrName: "",
+        attrValueList: [
+          /* {
+            attrId: 0,
+            valueName: "",
+          }, */
+        ],
+        categoryId: this.category3Id,
+        categoryLevel: 3,
+      };
     },
   },
 };
