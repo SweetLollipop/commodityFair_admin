@@ -36,7 +36,7 @@
                 type="warning"
                 icon="el-icon-edit"
                 size="mini"
-                @click="isShowTable = false"
+                @click="updateAttribute(row)"
               ></el-button>
               <el-button
                 type="danger"
@@ -109,6 +109,8 @@
 </template>
 
 <script>
+//按需引入lodash当中的深拷贝
+import cloneDeep from "lodash/cloneDeep";
 export default {
   name: "attribute",
   data() {
@@ -127,8 +129,8 @@ export default {
             valueName: "",
           }, */
         ],
-        categoryId: 0,
-        categoryLevel: 3,
+        categoryId: 0, //category3Id
+        categoryLevel: 3, //category3Id
       },
     };
   },
@@ -186,6 +188,14 @@ export default {
         categoryId: this.category3Id,
         categoryLevel: 3,
       };
+    },
+    //修改属性
+    updateAttribute(row) {
+      this.isShowTable = false; //切换table显示与隐藏
+      //将选中的属性赋值给attributeInfo
+      //由于数据结构当中存在对象里面套数组，数组里面又套对象，因此需要使用深拷贝解决
+      //深拷贝，浅拷贝在面试的时候出现的频率很高，切记达到手写深拷贝与浅拷贝
+      this.attributeInfo = cloneDeep(row);
     },
   },
 };
