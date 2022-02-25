@@ -84,11 +84,18 @@
           </el-table-column>
           <el-table-column prop="prop" label="属性值名称" width="width">
             <template slot-scope="{ row, $index }">
+              <!-- 这里结构需要用到input与span来回切换 -->
               <el-input
                 placeholder="请输入属性值名称"
                 v-model="row.valueName"
                 size="mini"
+                v-if="row.flag"
+                @blur="toLook(row)"
+                @keyup.native.enter="toLook(row)"
               ></el-input>
+              <span v-else @click="row.flag = true" style="display: block">{{
+                row.valueName
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
@@ -169,8 +176,11 @@ export default {
     addAttributeValue() {
       //向属性值的数组里面添加元素
       this.attributeInfo.attrValueList.push({
-        attrId: undefined, //相应属性的id
+        attrId: this.attributeInfo.id, //相应属性的id
         valueName: "", //相应属性值名称
+        //给每一个属性值添加一个标记flag，用户切花查看模式与编辑模式，好处，每一个属性可以控制自己的模式切换
+        //当前flag属性，响应式数据（数据变化视图跟着变化）
+        flag: true,
       });
     },
     //添加属性
@@ -196,6 +206,10 @@ export default {
       //由于数据结构当中存在对象里面套数组，数组里面又套对象，因此需要使用深拷贝解决
       //深拷贝，浅拷贝在面试的时候出现的频率很高，切记达到手写深拷贝与浅拷贝
       this.attributeInfo = cloneDeep(row);
+    },
+    //失去焦点的事件，切换为查看模式，展示span
+    toLook(row) {
+      row.flag = false;
     },
   },
 };
