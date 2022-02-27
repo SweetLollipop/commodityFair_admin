@@ -228,7 +228,7 @@ export default {
         return;
       };
       //row: 形参是当前用户添加的最新的属性
-      row.flag = false; //当前便捷模式变为查看模式（让input消失，显示span）
+      row.flag = false; //当前编辑模式变为查看模式（让input消失，显示span）
     },
   },
 };
