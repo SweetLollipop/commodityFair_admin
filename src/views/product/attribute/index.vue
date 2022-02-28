@@ -92,10 +92,14 @@
                 v-if="row.flag"
                 @blur="toLook(row)"
                 @keyup.native.enter="toLook(row)"
+                :ref="$index"
               ></el-input>
-              <span v-else @click="row.flag = true" style="display: block">{{
-                row.valueName
-              }}</span>
+              <span
+                v-else
+                @click="toEdit(row, $index)"
+                style="display: block"
+                >{{ row.valueName }}</span
+              >
             </template>
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
@@ -182,6 +186,9 @@ export default {
         //当前flag属性，响应式数据（数据变化视图跟着变化）
         flag: true,
       });
+      this.$nextTick(() => {
+        this.$refs[this.attributeInfo.attrValueList.length - 1].focus();
+      });
     },
     //添加属性
     addAttribute() {
@@ -236,6 +243,18 @@ export default {
       }
       //row: 形参是当前用户添加的最新的属性
       row.flag = false; //当前编辑模式变为查看模式（让input消失，显示span）
+    },
+    //点击span的回调，变为编辑模式
+    toEdit(row, index) {
+      row.flag = true;
+      //获取input节点，实现自动聚焦,index是变量，不能用refs.index,要用枚举的方式refs[index]
+      //注意：点击span的时候，切换为input变为编辑模式，但是需要注意，对于浏览器而言，页面重绘重排耗时间的
+      //点击span的时候，重绘重排一个input它是需要耗费时间，因此我们不可能一点击span立马获取到input
+      //$nextTick:当节点渲染完毕了，执行一次
+      this.$nextTick(() => {
+        //获取相应的input表单元素实现聚焦
+        this.$refs[index].focus();
+      });
     },
   },
 };
