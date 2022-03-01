@@ -53,8 +53,8 @@ export const reqAttributeList = (category1Id, category2Id, category3Id) => reque
             "categoryLevel": 3,    //category3Id
         }
 */
-export const reqAddAttribute = (data) => request({
+export const reqAddOrUpdateAttr = (data) => request({
     url: '/admin/product/saveAttrInfo',
     method: 'post',
-    data
+    data:data, //可简写成data
 })

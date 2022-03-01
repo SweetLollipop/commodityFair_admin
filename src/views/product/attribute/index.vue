@@ -119,7 +119,7 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-button type="primary">保存</el-button>
+        <el-button type="primary" @click="addOrUpdateAttr">保存</el-button>
         <el-button @click="isShowTable = true">取消</el-button>
       </div>
     </el-card>
@@ -267,7 +267,39 @@ export default {
     //最新版本的ElementUI---2.15.7,目前模板中的版本号2.13.2，确认事件onConfirm
     deleteAttrValue(index) {
       //当前删除属性值得操作是不需要发请求的
-      this.attributeInfo.attrValueList.splice(index,1);
+      this.attributeInfo.attrValueList.splice(index, 1);
+    },
+    //保存按钮，进行添加属性或者修改属性的操作
+    addOrUpdateAttr() {
+      //整理参数：1、如果用户添加了很多属性值，且属性值为空的不应该提交给服务器
+      //提交给服务器数据当中不应该出现flag字段
+      this.attributeInfo.attrValueList =
+        this.attributeInfo.attrValueList.filter((item) => {
+          //过滤掉属性值不为空的
+          if (item.valueName !== "") {
+            //删除掉flag属性
+            delete item.flag;
+            return true;
+          }
+        });
+      try {
+        //发请求
+        this.$API.attribute.reqAddOrUpdateAttr(this.attributeInfo);
+        //展示平台属性的信号量进行切换
+        this.isShowTable = true;
+        //提示消息
+        this.$message.success("保存成功!");
+        //保存成功以后需要再次获取平台属性进行展示
+        // this.getAttributeList(); //需延迟执行，$nextTick()此处方法无效
+        // this.$nextTick(() => {
+        //   this.getAttributeList();
+        // });
+        setTimeout(() => {
+          this.getAttributeList();
+        }, 0);
+      } catch (error) {
+        this.$message.error("保存失败!");
+      }
     },
   },
 };
