@@ -104,11 +104,18 @@
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
             <template slot-scope="{ row, $index }">
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-              ></el-button>
+              <!-- 气泡确认框 -->
+              <el-popconfirm
+                :title="`确定删除${row.valueName}吗?`"
+                @onConfirm="deleteAttrValue($index)"
+              >
+                <el-button
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  slot="reference"
+                ></el-button>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -255,6 +262,12 @@ export default {
         //获取相应的input表单元素实现聚焦
         this.$refs[index].focus();
       });
+    },
+    //气泡确认框确定按钮的回调
+    //最新版本的ElementUI---2.15.7,目前模板中的版本号2.13.2，确认事件onConfirm
+    deleteAttrValue(index) {
+      //当前删除属性值得操作是不需要发请求的
+      this.attributeInfo.attrValueList.splice(index,1);
     },
   },
 };
