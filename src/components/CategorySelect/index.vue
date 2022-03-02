@@ -7,6 +7,7 @@
           placeholder="请选择"
           v-model="cForm.category1Id"
           @change="handler1"
+          :disabled="show"
         >
           <el-option
             :label="c1.name"
@@ -21,6 +22,7 @@
           placeholder="请选择"
           v-model="cForm.category2Id"
           @change="handeler2"
+          :disabled="show"
         >
           <el-option
             :label="c2.name"
@@ -31,7 +33,12 @@
         </el-select>
       </el-form-item>
       <el-form-item label="三级分类">
-        <el-select placeholder="请选择" v-model="cForm.category3Id" @change="handler3">
+        <el-select
+          placeholder="请选择"
+          v-model="cForm.category3Id"
+          @change="handler3"
+          :disabled="show"
+        >
           <el-option
             :label="c3.name"
             :value="c3.id"
@@ -47,6 +54,7 @@
 <script>
 export default {
   name: "CategorySelect",
+  props: ["show"],
   data() {
     return {
       list1: [], //一级分类的数据
@@ -73,11 +81,11 @@ export default {
       //清除二级三级分类数据
       this.list2 = [];
       this.list3 = [];
-      this.cForm.category2Id = '';
-      this.cForm.category3Id = '';
+      this.cForm.category2Id = "";
+      this.cForm.category3Id = "";
       //解构出一级分类的id
       const { category1Id } = this.cForm;
-      this.$emit('getCategoryId',{categoryId:category1Id,level:1});  //传给父组件attribute
+      this.$emit("getCategoryId", { categoryId: category1Id, level: 1 }); //传给父组件attribute
       let result = await this.$API.attribute.reqCategory2List(category1Id);
       if (result.code === 200) {
         this.list2 = result.data;
@@ -87,20 +95,20 @@ export default {
     async handeler2() {
       //清除三级分类数据
       this.list3 = [];
-      this.cForm.category3Id = '';
+      this.cForm.category3Id = "";
       const { category2Id } = this.cForm;
-      this.$emit('getCategoryId',{categoryId:category2Id,level:2});  //传给父组件attribute
+      this.$emit("getCategoryId", { categoryId: category2Id, level: 2 }); //传给父组件attribute
       let result = await this.$API.attribute.reqCategory3List(category2Id);
       if (result.code === 200) {
         this.list3 = result.data;
       }
     },
     //三级分类的事件回调
-    handler3(){
+    handler3() {
       //获取三级分类id
       const { category3Id } = this.cForm;
-      this.$emit('getCategoryId',{categoryId:category3Id,level:3});  //传给父组件attribute
-    }
+      this.$emit("getCategoryId", { categoryId: category3Id, level: 3 }); //传给父组件attribute
+    },
   },
   //组件挂载挂载完毕：向服务器发请求，获取相应的一级分类的数据
   mounted() {
