@@ -37,12 +37,14 @@ Vue.config.productionTip = false
 
 // 引入相关API请求接口
 import API from '@/api'
-//引入CategorySelect组件
+//引入CategorySelect、HintButton组件
 import CategorySelect from '@/components/CategorySelect'
+import HintButton from '@/components/HintButton'
 // 接口挂载到vue原型，任意组件可以使用API
 Vue.prototype.$API = API
-//注册全局组件CategorySelect
-Vue.component( CategorySelect.name, CategorySelect )
+//注册全局组件CategorySelect、HintButton
+Vue.component(CategorySelect.name, CategorySelect)
+Vue.component(HintButton.name, HintButton)
 
 new Vue({
   el: '#app',

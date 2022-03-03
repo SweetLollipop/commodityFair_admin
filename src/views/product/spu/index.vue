@@ -9,25 +9,45 @@
       <div>
         <!-- 展示SPU列表的结构 -->
         <el-button type="primary" icon="el-icon-plus">添加SPU</el-button>
-        <el-table style="width: 100%" borde>
+        <el-table style="width: 100%" border :data="records">
           <el-table-column
             type="index"
             label="序号"
-            width="width: 80px"
+            width="80px"
             align="center"
           >
           </el-table-column>
-          <el-table-column prop="prop" label="SPU名称" width="width">
+          <el-table-column prop="spuName" label="SPU名称" width="width">
           </el-table-column>
-          <el-table-column prop="prop" label="SPU描述" width="width">
+          <el-table-column prop="description" label="SPU描述" width="width">
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
             <template slot-scope="{ row, $index }">
               <!-- 这里按钮将来用hintButton替换 -->
-              <el-button type="success" icon="el-icon-plus"></el-button>
-              <el-button type="warning" icon="el-icon-edit"></el-button>
-              <el-button type="info" icon="el-icon-info"></el-button>
-              <el-button type="danger" icon="el-icon-delete"></el-button>
+              <hint-button
+                type="success"
+                icon="el-icon-plus"
+                size="mini"
+                title="添加sku"
+              ></hint-button>
+              <hint-button
+                type="warning"
+                icon="el-icon-edit"
+                size="mini"
+                title="修改spu"
+              ></hint-button>
+              <hint-button
+                type="info"
+                icon="el-icon-info"
+                size="mini"
+                title="查看当前spu全部sku列表"
+              ></hint-button>
+              <hint-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                title="删除spu"
+              ></hint-button>
             </template>
           </el-table-column>
         </el-table>
@@ -39,7 +59,7 @@
           :page-count="7"
           :page-sizes="[3, 5, 10]"
           background
-          @current-change="getPageList"
+          @current-change="getSpuList"
           @size-change="handleSizeChange"
           layout="prev, pager, next, jumper, ->, sizes, total"
         >
@@ -62,9 +82,19 @@ export default {
       category3Id: "",
       //控制三级联动的可操作性
       show: true,
+      page: 1, //分页器当前第几页
+      limit: 3, //每页展示多少条数据
+      total: 0, //分页器一共需要展示数据的条数
+      records: [], //spu列表的数据
     };
   },
   methods: {
+    //点击页码按钮
+    /* handleCurrentChange(pager){
+        this.page = pager //修改参数
+        this.getSpuList() //再调请求
+    }, */
+
     //三级联动的自定义事件，可将子组件的相应id传递给父组件
     getCategoryId({ categoryId, level }) {
       //区分三级分类相应的id,以及父组件进行存储
@@ -82,7 +112,21 @@ export default {
       }
     },
     //获取spu列表数据的方法
-    getSpuList() {},
+    async getSpuList(pager = 1) {
+      this.page = pager;
+      const { page, limit, category3Id } = this;
+      //携带三个参数：page第几页，limit每页展示多少条数据，category3Id三级分类id
+      let result = await this.$API.spu.reqSpuList(page, limit, category3Id);
+      if (result.code === 200) {
+        this.total = result.data.total;
+        this.records = result.data.records;
+      }
+    },
+    //当分页器某一页需要战术数据条数发生变化的时候会触发
+    handleSizeChange(limit) {
+      this.limit = limit; //修改参数
+      this.getSpuList(); //再调请求
+    },
   },
 };
 </script>
