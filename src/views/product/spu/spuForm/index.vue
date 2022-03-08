@@ -70,6 +70,10 @@ export default {
     return {
       dialogImageUrl: "",
       dialogVisible: false,
+      spu: {}, //存储SPU信息属性
+      tradeMarkList: [], //存储品牌信息
+      spuImageList: [], //存储SPU图片的数据
+      saleAttrList: [], //销售属性的数据
     };
   },
   methods: {
@@ -81,8 +85,27 @@ export default {
       this.dialogVisible = true;
     },
     //初始化spuForm数据
-    initSpuData(spu) {
-      console.log("子组件发请求的方法",spu);
+    async initSpuData(spu) {
+      //获取SPU信息
+      let spuResult = await this.$API.spu.reqSpu(spu.id);
+      if (spuResult.code === 200) {
+        this.spu = spuResult.data;
+      }
+      //获取品牌数据
+      let tradeMarkResult = await this.$API.spu.reqTrademark();
+      if (tradeMarkResult.code === 200) {
+        this.tradeMarkList = tradeMarkResult.data;
+      }
+      //获取spu图片数据
+      let spuImageResult = await this.$API.spu.reqSpuImageList(spu.id);
+      if (spuImageResult.code === 200) {
+        this.spuImageList = spuImageResult.data;
+      }
+      //获取平台全部的销售属性
+      let saleResult = await this.$API.spu.reqBaseSaleAttrList();
+      if (saleResult.code === 200) {
+        this.saleAttrList = saleResult.data;
+      }
     },
   },
 };
