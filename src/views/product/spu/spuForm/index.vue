@@ -1,21 +1,35 @@
 <template>
   <div>
-    <el-form ref="form" label-width="80px">
+    <el-form ref="form" label-width="80px" :model="spu">
       <el-form-item label="SPU名称">
-        <el-input placeholder="SPU名称"></el-input>
+        <el-input placeholder="SPU名称" v-model="spu.spuName"></el-input>
       </el-form-item>
       <el-form-item label="品牌">
-        <el-select placeholder="请选择品牌" value="">
-          <el-option value="value"></el-option>
+        <el-select placeholder="请选择品牌" v-model="spu.tmId">
+          <el-option
+            :label="tm.tmName"
+            :value="tm.id"
+            v-for="(tm, index) in tradeMarkList"
+            :key="index"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="SPU描述">
-        <el-input type="textarea" rows="4" placeholder="SPU描述"></el-input>
+        <el-input
+          type="textarea"
+          rows="4"
+          placeholder="SPU描述"
+          v-model="spu.description"
+        ></el-input>
       </el-form-item>
       <el-form-item label="SPU图片">
+        <!-- 上传图片：action图片上传的地址 list-type:文件列表的类型 on-preview:预览图片会触发，
+          on-remove:删除图片会触发。file-list
+        -->
         <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
+          action="/dev-api/admin/product/fileUpload"
           list-type="picture-card"
+          :file-list="spu.spuImageList"
           :on-preview="handlePictureCardPreview"
           :on-remove="handleRemove"
         >
@@ -70,7 +84,44 @@ export default {
     return {
       dialogImageUrl: "",
       dialogVisible: false,
-      spu: {}, //存储SPU信息属性
+      //spu属性初始化的时候是一个空对象,在修改spu的时候，会向服务器发请求，返回SPU信息（对象），
+      //在修改的时候可以利用服务器返回的这个对象收集最新的数据提交个服务器
+      //添加spu,如果添加SPU的时候并没有向服务器发请求，数据收集到spu，收集数据的时候收集了哪些字段？看文档，需初始化其字段
+      spu: {
+        category3Id: 0, //三级分类id
+        description: "", //描述
+        spuName: "", //spu名称
+        tmId: 0, //品牌id
+        spuImageList: [
+          //图片列表
+          {
+            id: 0,
+            imgName: "string",
+            imgUrl: "string",
+            spuId: 0,
+          },
+        ],
+        spuSaleAttrList: [
+          //销售属性列表
+          {
+            baseSaleAttrId: 0,
+            id: 0,
+            saleAttrName: "string",
+            spuId: 0,
+            spuSaleAttrValueList: [
+              //销售属性值列表
+              {
+                baseSaleAttrId: 0,
+                id: 0,
+                isChecked: "string",
+                saleAttrName: "string",
+                saleAttrValueName: "string",
+                spuId: 0,
+              },
+            ],
+          },
+        ],
+      }, //存储SPU信息属性
       tradeMarkList: [], //存储品牌信息
       spuImageList: [], //存储SPU图片的数据
       saleAttrList: [], //销售属性的数据
@@ -89,6 +140,7 @@ export default {
       //获取SPU信息
       let spuResult = await this.$API.spu.reqSpu(spu.id);
       if (spuResult.code === 200) {
+        //在修改spu的时候，需要向服务器发请求的，把服务器返回的数据（对象），赋值给spu属性
         this.spu = spuResult.data;
       }
       //获取品牌数据
@@ -99,12 +151,20 @@ export default {
       //获取spu图片数据
       let spuImageResult = await this.$API.spu.reqSpuImageList(spu.id);
       if (spuImageResult.code === 200) {
-        this.spuImageList = spuImageResult.data;
+        let listArr = spuImageResult.data;
+        //由于照片墙显示图片的数据需要数组，数组里面的元素需要有name与url字段
+        //需要把服务器返回的数据进行修改
+        listArr.forEach((item) => {
+          item.name = item.imgName;
+          item.url = item.imgUrl;
+        });
+        //把整理哈的数据赋值给this.spu.spuImageList
+        this.spu.spuImageList = listArr;
       }
       //获取平台全部的销售属性
       let saleResult = await this.$API.spu.reqBaseSaleAttrList();
       if (saleResult.code === 200) {
-        this.saleAttrList = saleResult.data;
+        this.spu.spuSaleAttrList = saleResult.data;
       }
     },
   },
