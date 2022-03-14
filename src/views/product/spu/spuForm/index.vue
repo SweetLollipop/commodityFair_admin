@@ -44,16 +44,20 @@
       <el-form-item label="销售属性">
         <el-select
           :placeholder="`还有${unSelectSaleAttr.length}未选择`"
-          v-model="attrId"
+          v-model="attrIdAndAttrName"
         >
           <el-option
             :label="unselect.name"
-            :value="unselect.id"
+            :value="`${unselect.id}:${unselect.name}`"
             v-for="(unselect, index) in unSelectSaleAttr"
             :key="index"
           ></el-option>
         </el-select>
-        <el-button type="primary" icon="el-icon-plus" :disabled="!attrId"
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          :disabled="!attrIdAndAttrName"
+          @click="addSaleAttr"
           >添加销售属性</el-button
         >
         <el-table style="width: 100%" border :data="spu.spuSaleAttrList">
@@ -162,7 +166,7 @@ export default {
       tradeMarkList: [], //存储品牌信息
       spuImageList: [], //存储SPU图片的数据
       saleAttrList: [], //销售属性的数据
-      attrId: "", //收集未选择的销售属性的id---收集到哪里都可以，在发请求之前整理好数据格式即可
+      attrIdAndAttrName: "", //收集未选择的销售属性的id---收集到哪里都可以，在发请求之前整理好数据格式即可
     };
   },
   methods: {
@@ -183,7 +187,7 @@ export default {
       this.dialogVisible = true;
     },
     //照片墙图片上传成功的回调
-    handlerSuccess(response, file, fileList){
+    handlerSuccess(response, file, fileList) {
       //response:上传一张图片成功后服务器返回的信息
       //file：点击上传成功的那张图片信息
       //fileList:点击上传成功后，照片墙所有的图片列表信息
@@ -221,6 +225,19 @@ export default {
       if (saleResult.code === 200) {
         this.saleAttrList = saleResult.data;
       }
+    },
+    //添加新的销售属性
+    addSaleAttr() {
+      //已经收集需要添加的销售属性的信息
+      //把收集到的销售属性数据进行分割
+      const [baseSaleAttrId, saleAttrName] = this.attrIdAndAttrName.split(":");
+      //向spu对象的spuSaleAttrList属性里面添加新的销售属性
+      let newSaleAttr = {
+        baseSaleAttrId,
+        saleAttrName,
+        spuSaleAttrValueList: [],
+      };
+      this.spu.spuSaleAttrList.push(newSaleAttr);
     },
   },
   computed: {
