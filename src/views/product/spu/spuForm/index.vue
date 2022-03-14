@@ -24,14 +24,16 @@
       </el-form-item>
       <el-form-item label="SPU图片">
         <!-- 上传图片：action图片上传的地址 list-type:文件列表的类型 on-preview:预览图片会触发，
-          on-remove:删除图片会触发。file-list
+          on-remove:删除图片会触发。file-list：照片墙需要展示的数据（数组：数组中的元素务必要有name、url属性）
+          :on-preview：图片预览功能  :on-remove：图片删除功能
         -->
         <el-upload
           action="/dev-api/admin/product/fileUpload"
           list-type="picture-card"
-          :file-list="spu.spuImageList"
+          :file-list="spuImageList"
           :on-preview="handlePictureCardPreview"
           :on-remove="handleRemove"
+          :on-success="handlerSuccess"
         >
           <i class="el-icon-plus"></i>
         </el-upload>
@@ -164,12 +166,29 @@ export default {
     };
   },
   methods: {
+    //照片墙删除某个图片的时候会触发
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      //file参数：代表点击删除的那张图片
+      //fileList：照片前删除某一张图片以后，剩余的其他图片
+      //收集照片墙图片的数据
+      //对于已有的图片（照片墙中显示的图片：有name、url字段的），因为照片墙显示务必要有这两个属性
+      //对于服务器而言，不需要name,url字段，将来对于有的图片的数据在提交给服务器的时候，需要处理的
+      this.spuImageList = fileList;
     },
+    //照片墙图片预览的回调
     handlePictureCardPreview(file) {
+      //将图片存储地址赋值给dialogImageUrl
       this.dialogImageUrl = file.url;
+      //对话框显示
       this.dialogVisible = true;
+    },
+    //照片墙图片上传成功的回调
+    handlerSuccess(response, file, fileList){
+      //response:上传一张图片成功后服务器返回的信息
+      //file：点击上传成功的那张图片信息
+      //fileList:点击上传成功后，照片墙所有的图片列表信息
+      //收集图片的信息
+      this.spuImageList = fileList;
     },
     //初始化spuForm数据
     async initSpuData(spu) {
@@ -194,8 +213,8 @@ export default {
           item.name = item.imgName;
           item.url = item.imgUrl;
         });
-        //把整理哈的数据赋值给this.spu.spuImageList
-        this.spu.spuImageList = listArr;
+        //把整理哈的数据赋值给this.spuImageList
+        this.spuImageList = listArr;
       }
       //获取平台全部的销售属性
       let saleResult = await this.$API.spu.reqBaseSaleAttrList();
