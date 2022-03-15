@@ -75,6 +75,7 @@
           ></el-table-column>
           <el-table-column prop="prop" label="属性值名称列表" width="width">
             <template slot-scope="{ row, $index }">
+              <!-- el-tag用于展示已有属性值列表的数据 -->
               <el-tag
                 :key="tag.id"
                 v-for="tag in row.spuSaleAttrValueList"
@@ -91,10 +92,15 @@
                 v-model="row.inputValue"
                 ref="saveTagInput"
                 size="small"
+                @blur="handleInputConfirm(row)"
               >
               </el-input>
               <!-- @click="showInput" -->
-              <el-button v-else class="button-new-tag" size="small"
+              <el-button
+                v-else
+                class="button-new-tag"
+                size="small"
+                @click="addSaleAttrValue(row)"
                 >添加</el-button
               >
             </template>
@@ -166,7 +172,7 @@ export default {
       tradeMarkList: [], //存储品牌信息
       spuImageList: [], //存储SPU图片的数据
       saleAttrList: [], //销售属性的数据
-      attrIdAndAttrName: "", //收集未选择的销售属性的id---收集到哪里都可以，在发请求之前整理好数据格式即可
+      attrIdAndAttrName: "", //收集下拉菜单选中的销售属性的id和name---收集到哪里都可以，在发请求之前整理好数据格式即可
     };
   },
   methods: {
@@ -238,6 +244,47 @@ export default {
         spuSaleAttrValueList: [],
       };
       this.spu.spuSaleAttrList.push(newSaleAttr);
+      //清空数据
+      this.attrIdAndAttrName = "";
+    },
+    //添加按钮的回调
+    addSaleAttrValue(row,index) {
+      //点击销售属性值当中的添加按钮的时候，需要有button变成input,通过当前销售属性的inputVisible控制
+      //row.inputVisible=true不能生效，需用响应式$set()
+      //挂载在销售属性身上的响应式数据inputVisible,控制button与input切换
+      this.$set(row, "inputVisible", true);
+      //通过响应式数据inputValue字段收集新增的销售属性值
+      this.$set(row, "inputValue", "");
+      //点击button的时候，重绘重排一个input它是需要耗费时间，因此我们不可能一点击button立马获取到input
+      //$nextTick:当节点渲染完毕了，执行一次
+      this.$nextTick(() => {
+        //获取相应的input表单元素实现聚焦
+        this.$refs.saveTagInput.focus();
+      });
+    },
+    //el-input失去焦点的事件
+    handleInputConfirm(row) {
+      //解构出销售属性当中收集数据
+      const { baseSaleAttrId, inputValue } = row;
+      //新增的销售属性值名称不能为空
+      if (inputValue.trim() === "") {
+        this.$message.error("填写的属性值不能为空");
+        return;
+      }
+      //新增的属性值名称不能重复
+      let result = row.spuSaleAttrValueList.every(
+        (item) => item.saleAttrValueName === inputValue
+      );
+      if (result) {
+        this.$message.error("填写的属性值不能重复");
+        return;
+      }
+      //新增的销售属性值
+      let newSaleAttrValue = { baseSaleAttrId, saleAttrValueName: inputValue };
+      //新增
+      row.spuSaleAttrValueList.push(newSaleAttrValue);
+      //修改inputVisible为false,就显示button
+      row.inputVisible = false;
     },
   },
   computed: {
