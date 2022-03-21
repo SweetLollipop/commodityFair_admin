@@ -2,7 +2,7 @@
   <div>
     <el-card style="margin: 20px 0px">
       <!-- CategorgSelect已经在main.js中注册为全局组件了 -->
-      <CategorySelect @getCategoryId="getCategoryId" :show="!show" />
+      <CategorySelect @getCategoryId="getCategoryId" :show="scene !== 0" />
     </el-card>
     <el-card>
       <!-- 底部下面是由三部分切换 -->
@@ -97,7 +97,7 @@ export default {
       category2Id: "",
       category3Id: "",
       //控制三级联动的可操作性
-      show: true,
+      // show: true,
       page: 1, //分页器当前第几页
       limit: 3, //每页展示多少条数据
       total: 0, //分页器一共需要展示数据的条数

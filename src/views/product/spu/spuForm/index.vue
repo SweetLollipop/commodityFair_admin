@@ -78,9 +78,10 @@
               <!-- el-tag用于展示已有属性值列表的数据 -->
               <el-tag
                 :key="tag.id"
-                v-for="tag in row.spuSaleAttrValueList"
+                v-for="(tag, index) in row.spuSaleAttrValueList"
                 closable
                 :disable-transitions="false"
+                @close="row.spuSaleAttrValueList.splice(index, 1)"
               >
                 {{ tag.saleAttrValueName }}
               </el-tag>
@@ -111,6 +112,7 @@
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
+                @click="spu.spuSaleAttrList.splice($index, 1)"
               ></el-button>
             </template>
           </el-table-column>
@@ -248,7 +250,7 @@ export default {
       this.attrIdAndAttrName = "";
     },
     //添加按钮的回调
-    addSaleAttrValue(row,index) {
+    addSaleAttrValue(row, index) {
       //点击销售属性值当中的添加按钮的时候，需要有button变成input,通过当前销售属性的inputVisible控制
       //row.inputVisible=true不能生效，需用响应式$set()
       //挂载在销售属性身上的响应式数据inputVisible,控制button与input切换
@@ -271,8 +273,8 @@ export default {
         this.$message.error("填写的属性值不能为空");
         return;
       }
-      //新增的属性值名称不能重复
-      let result = row.spuSaleAttrValueList.every(
+      //新增的属性值名称不能重复: 若存在重复的返回true,否则返回false
+      let result = row.spuSaleAttrValueList.some(
         (item) => item.saleAttrValueName === inputValue
       );
       if (result) {
