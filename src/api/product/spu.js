@@ -6,9 +6,9 @@ import request from '@/utils/request';
     请求类型：get
 */
 export const reqSpuList = (page, limit, category3Id) => request({
-    url: `/admin/product/${page}/${limit}`,
-    method: 'get',
-    params: { category3Id },
+  url: `/admin/product/${page}/${limit}`,
+  method: 'get',
+  params: { category3Id },
 })
 
 /* 
@@ -17,8 +17,8 @@ export const reqSpuList = (page, limit, category3Id) => request({
     请求类型：get
 */
 export const reqSpu = (spuId) => request({
-    url: `/admin/product/getSpuById/${spuId}`,
-    method: 'get',
+  url: `/admin/product/getSpuById/${spuId}`,
+  method: 'get',
 })
 
 /* 
@@ -27,8 +27,8 @@ export const reqSpu = (spuId) => request({
     请求类型：get
 */
 export const reqTrademark = () => request({
-    url: '/admin/product/baseTrademark/getTrademarkList',
-    method: 'get',
+  url: '/admin/product/baseTrademark/getTrademarkList',
+  method: 'get',
 })
 
 /* 
@@ -37,8 +37,8 @@ export const reqTrademark = () => request({
     请求类型：get
 */
 export const reqSpuImageList = (spuId) => request({
-    url: `/admin/product/spuImageList/${spuId}`,
-    method: 'get',
+  url: `/admin/product/spuImageList/${spuId}`,
+  method: 'get',
 })
 
 /* 
@@ -47,9 +47,9 @@ export const reqSpuImageList = (spuId) => request({
     请求类型：get
 */
 export const reqBaseSaleAttrList = () => request({
-    url: '/admin/product/baseSaleAttrList',
-    method: 'get',
-}) 
+  url: '/admin/product/baseSaleAttrList',
+  method: 'get',
+})
 
 /* 
 {
@@ -86,3 +86,26 @@ export const reqBaseSaleAttrList = () => request({
   ],
 }
 */
+
+/* 
+    修改SPU|添加SPU---对于修改或者添加，携带给服务器参数大致是一样的，唯一的区别就是携带的参数是否带id
+    接口：/admin/product/saveSpuInfo   /admin/product/updateSpuInfo
+    请求类型：post
+*/
+export const reqAddOrUpdateSpu = (spuInfo) => {
+  //携带的参数带有id---修改spu
+  if (spuInfo.id) {
+    return request({
+      url: '/admin/product/updateSpuInfo',
+      method: 'post',
+      data: spuInfo,
+    })
+  } else {
+    //携带的参数不带id---新增spu
+    return request({
+      url: '/admin/product/saveSpuInfo',
+      method: 'post',
+      data: spuInfo,
+    })
+  }
+} 

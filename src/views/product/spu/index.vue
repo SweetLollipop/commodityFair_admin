@@ -158,6 +158,8 @@ export default {
     //自定义事件（spuForm）
     changeScene(scene) {
       this.scene = scene; //切换结构(场景)
+      //子组件通知父组件切换场景，需要再次获取SPU列表的数据进行展示
+      this.getSpuList(this.page);
     },
   },
 };
