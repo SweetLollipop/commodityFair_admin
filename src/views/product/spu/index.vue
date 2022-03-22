@@ -147,6 +147,8 @@ export default {
     //添加SPU按钮的回调
     addSpu() {
       this.scene = 1;
+      //通知子组件发请求--两个：获取品牌、获取销售属性
+      this.$refs.spu.addSpuData(this.category3Id);
     },
     //修改某一个SPU
     updateSpu(row) {
@@ -156,10 +158,17 @@ export default {
       this.$refs.spu.initSpuData(row);
     },
     //自定义事件（spuForm）
-    changeScene(scene) {
+    changeScene({ scene, flag }) {
+      //flag这个形参是为了区分保存按钮是添加操作还是修改操作
       this.scene = scene; //切换结构(场景)
       //子组件通知父组件切换场景，需要再次获取SPU列表的数据进行展示
-      this.getSpuList(this.page);
+      if (flag === "修改") {
+        this.getSpuList(this.page); //修改时，获取当前页列表
+      } else if (flag === "添加") {
+        this.getSpuList(); //添加时，默认跳转并获取第一页列表
+      } else {
+        this.getSpuList(this.page); //取消时，获取当前页列表
+      }
     },
   },
 };

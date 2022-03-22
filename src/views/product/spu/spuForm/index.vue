@@ -120,7 +120,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="addOrUpdateSpu">保存</el-button>
-        <el-button @click="$emit('changeScene', 0)">取消</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -140,7 +140,7 @@ export default {
         category3Id: 0, //三级分类id
         description: "", //描述
         spuName: "", //spu名称
-        tmId: 0, //品牌id
+        tmId: "", //品牌id
         spuImageList: [
           //图片列表
           {
@@ -152,7 +152,7 @@ export default {
         ],
         spuSaleAttrList: [
           //销售属性列表
-          {
+          /* {
             baseSaleAttrId: 0,
             id: 0,
             saleAttrName: "string",
@@ -168,7 +168,7 @@ export default {
                 spuId: 0,
               },
             ],
-          },
+          }, */
         ],
       }, //存储SPU信息属性
       tradeMarkList: [], //存储品牌信息
@@ -303,9 +303,42 @@ export default {
       if (result.code === 200) {
         this.$message.success("保存成功");
         //通知父组件回到场景0: scene=0
-        this.$emit("changeScene", 0);
+        this.$emit("changeScene", {
+          scene: 0,
+          flag: this.spu.id ? "修改" : "添加",
+        });
+      }
+      //清空数据
+      //Object.assign : ES6中新增的方法（合并对象）
+      //组件实例this._data,可以操作data当中响应式数据
+      //this.$options可以获取配置对象，配置对象的data函数执行，返回响应式数据为空的
+      Object.assign(this._data,this.$options.data());
+    },
+    //点击父组件中“添加SPU”的时候，发请求的函数
+    async addSpuData(category3Id) {
+      //接收从父组件传递过来的参数category3Id
+      this.spu.category3Id = category3Id;
+      //获取品牌数据
+      let tradeMarkResult = await this.$API.spu.reqTrademark();
+      if (tradeMarkResult.code === 200) {
+        this.tradeMarkList = tradeMarkResult.data;
+      }
+      //获取平台全部的销售属性
+      let saleResult = await this.$API.spu.reqBaseSaleAttrList();
+      if (saleResult.code === 200) {
+        this.saleAttrList = saleResult.data;
       }
     },
+    //点击取消按钮
+    cancel(){
+      //通知父组件切换场景为0：scene=0
+      this.$emit('changeScene', { scene: 0, flag: '取消' })
+      //清空数据
+      //Object.assign : ES6中新增的方法（合并对象）
+      //组件实例this._data,可以操作data当中响应式数据
+      //this.$options可以获取配置对象，配置对象的data函数执行，返回响应式数据为空的
+      Object.assign(this._data,this.$options.data());
+    }
   },
   computed: {
     //计算出还未选择的销售属性
