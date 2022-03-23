@@ -35,6 +35,7 @@
                 icon="el-icon-plus"
                 size="mini"
                 title="添加sku"
+                @click="addSku(row)"
               ></hint-button>
               <hint-button
                 type="warning"
@@ -181,6 +182,11 @@ export default {
         //代表当SPU个数大于1时，删除后停留在当前页；否则跳转到上一页
         this.getSpuList(this.records.length > 1 ? this.page : this.page - 1);
       }
+    },
+    //添加SKU按钮的回调
+    addSku(row) {
+      //切换场景为2 scene=2
+      this.scene = 2;
     },
   },
 };
