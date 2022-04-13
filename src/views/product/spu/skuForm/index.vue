@@ -43,7 +43,10 @@
             v-for="(saleAttr, index) in spuSaleAttrList"
             :key="saleAttr.id"
           >
-            <el-select placeholder="请选择" v-model="saleAttr.saleAttrIdAndsaleAttrValueId">
+            <el-select
+              placeholder="请选择"
+              v-model="saleAttr.saleAttrIdAndsaleAttrValueId"
+            >
               <el-option
                 :label="saleAttrValue.saleAttrValueName"
                 :value="`${saleAttr.id}:${saleAttrValue.id}`"
@@ -55,19 +58,34 @@
         </el-form>
       </el-form-item>
       <el-form-item label="图片列表">
-        <el-table style="width: 100%" border>
-          <el-table-column
-            prop="prop"
-            label="label"
-            type="selection"
-            width="55px"
-          >
+        <el-table
+          style="width: 100%"
+          border
+          :data="spuImageList"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column prop="prop" type="selection" width="55px">
           </el-table-column>
           <el-table-column prop="prop" label="图片" width="width">
+            <template slot-scope="{ row, $index }">
+              <img :src="row.imgUrl" style="width: 100px; height: 100px" />
+            </template>
           </el-table-column>
-          <el-table-column prop="prop" label="名称" width="width">
+          <el-table-column prop="imgName" label="名称" width="width">
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
+            <template slot-scope="{ row, $index }">
+              <el-button
+                type="primary"
+                size="mini"
+                v-if="row.isDefault === 0"
+                @click="changeDefault(row)"
+                >设置默认</el-button
+              >
+              <el-button v-else size="mini" style="color: #409eff"
+                >默认</el-button
+              >
+            </template>
           </el-table-column>
         </el-table>
       </el-form-item>
@@ -136,6 +154,8 @@ export default {
         ],
       },
       spu: {},
+      //收集选中图片的数据字段: 但是需要注意，收集的数据目前缺少isDefault字段，将来提交给服务器数据的时候，需要整理参数
+      imageList: [],
     };
   },
   methods: {
@@ -149,7 +169,12 @@ export default {
       //获取图片的数据
       let result1 = await this.$API.sku.reqSpuImageList(spu.id);
       if (result1.code === 200) {
-        this.spuImageList = result1.data;
+        let imgList = result1.data;
+        //当服务器返回图片数据的时候，下面进行多添加一个字段isDefault
+        imgList.forEach((element) => {
+          element.isDefault = 0; //0:设置默认；1：默认
+        });
+        this.spuImageList = imgList;
       }
       //获取销售属性的数据
       let result2 = await this.$API.sku.reqSpuSaleAttrList(spu.id);
@@ -165,6 +190,22 @@ export default {
       if (result3.code === 200) {
         this.attrInfoList = result3.data;
       }
+    },
+    //table表格复选框的事件
+    handleSelectionChange(params) {
+      //获取到用户选中图片的信息数据，但是需要注意，当前收集的数据当中，缺少isDefalut字段
+      this.imageList = params;
+    },
+    //排他操作（选中后排出其他）
+    changeDefault(row) {
+      //图片列表的数据的isDefault字段变为0
+      this.spuImageList.forEach((item) => {
+        item.isDefault = 0;
+      });
+      //点击的哪个图片的数据的isDefault字段变为1
+      row.isDefault = 1;
+      //收集默认图片的地址
+      this.skuInfo.skuDefaultImg = row.imgUrl;
     },
   },
 };
