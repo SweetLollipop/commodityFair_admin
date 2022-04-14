@@ -81,7 +81,11 @@
         @changeScene="changeScene"
         ref="spu"
       ></spuForm>
-      <skuForm v-show="scene === 2" ref="sku"></skuForm>
+      <skuForm
+        v-show="scene === 2"
+        ref="sku"
+        @changeScenes="changeScenes"
+      ></skuForm>
     </el-card>
   </div>
 </template>
@@ -189,6 +193,10 @@ export default {
       this.scene = 2;
       //父组件调用子组件的方法，让子组件发请求---三个请求
       this.$refs.sku.getData(this.category1Id, this.category2Id, row);
+    },
+    //skuform通知父组件修改场景
+    changeScenes(scene){
+      this.scene = scene;
     },
   },
 };
