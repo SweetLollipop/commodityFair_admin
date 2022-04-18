@@ -49,6 +49,7 @@
                 icon="el-icon-info"
                 size="mini"
                 title="查看当前spu全部sku列表"
+                @click="handler(row)"
               ></hint-button>
               <el-popconfirm title="确定删除吗？" @onConfirm="deleteSpu(row)">
                 <hint-button
@@ -87,6 +88,33 @@
         @changeScenes="changeScenes"
       ></skuForm>
     </el-card>
+    <el-dialog
+      :title="`${spu.spuName}的sku列表`"
+      :visible.sync="dialogTableVisible"
+    >
+      <el-table :data="skuList" style="width: 100%" border>
+        <el-table-column
+          prop="skuName"
+          label="名称"
+          width="width"
+        ></el-table-column>
+        <el-table-column
+          prop="price"
+          label="价格"
+          width="width"
+        ></el-table-column>
+        <el-table-column
+          prop="weight"
+          label="重量"
+          width="width"
+        ></el-table-column>
+        <el-table-column label="默认图片" width="width">
+          <template slot-scope="{ row, $index }">
+            <img :src="row.skuDefaultImg" style="width: 100px; height: 100px" />
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -111,6 +139,9 @@ export default {
       total: 0, //分页器一共需要展示数据的条数
       records: [], //spu列表的数据
       scene: 0, //0代表展示SPU列表数据  1代表添加SPU|修改SPU  2代表添加SKU
+      dialogTableVisible: false, //控制对话框的显示与隐藏
+      spu: {}, //声明一个spu,后续为了“查看SKU”功能而存储对应的spu
+      skuList: [], //存储sku列表的数据
     };
   },
   methods: {
@@ -195,12 +226,27 @@ export default {
       this.$refs.sku.getData(this.category1Id, this.category2Id, row);
     },
     //skuform通知父组件修改场景
-    changeScenes(scene){
+    changeScenes(scene) {
       this.scene = scene;
+    },
+    //查看SKU的按钮的回调
+    async handler(spu) {
+      //点击这个按钮的时候，对话框可见的
+      this.dialogTableVisible = true;
+      //保存SPU信息
+      this.spu = spu;
+      //获取sku列表的数据进行展示
+      let result = await this.$API.spu.reqSkuList(spu.id);
+      if (result.code === 200) {
+        this.skuList = result.data;
+      }
     },
   },
 };
 </script>
 
 <style>
+.el-dialog {
+  margin-bottom: 10vh;
+}
 </style>
