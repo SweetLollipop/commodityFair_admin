@@ -91,8 +91,9 @@
     <el-dialog
       :title="`${spu.spuName}的sku列表`"
       :visible.sync="dialogTableVisible"
+      :before-close="close"
     >
-      <el-table :data="skuList" style="width: 100%" border>
+      <el-table :data="skuList" style="width: 100%" v-loading="loading" border>
         <el-table-column
           prop="skuName"
           label="名称"
@@ -142,6 +143,7 @@ export default {
       dialogTableVisible: false, //控制对话框的显示与隐藏
       spu: {}, //声明一个spu,后续为了“查看SKU”功能而存储对应的spu
       skuList: [], //存储sku列表的数据
+      loading: true, //在表格等容器中加载数据时显示
     };
   },
   methods: {
@@ -239,7 +241,18 @@ export default {
       let result = await this.$API.spu.reqSkuList(spu.id);
       if (result.code === 200) {
         this.skuList = result.data;
+        //loading隐藏
+        this.loading = false;
       }
+    },
+    //关闭对话框前的回调
+    close(done) {
+      //loading属性再次变为真
+      this.loading = true;
+      //清除sku列表的数据
+      this.skuList = [];
+      //关闭对话框
+      done();
     },
   },
 };
