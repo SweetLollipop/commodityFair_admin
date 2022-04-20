@@ -29,3 +29,13 @@ export const reqCancelSale = (skuId) => request({
   url: `/admin/product/cancelSale/${skuId}`,
   method: 'get',
 })
+
+/* 
+    获取SKU详情的接口
+    接口：/admin/product/getSkuById/{skuId}
+    请求类型：get
+*/
+export const reqSkuById = (skuId) => request({
+  url: `/admin/product/getSkuById/${skuId}`,
+  method: 'get',
+})

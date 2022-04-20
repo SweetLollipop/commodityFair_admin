@@ -63,7 +63,7 @@
             icon="el-icon-info"
             size="mini"
             title="查看sku"
-            @click="handler(row)"
+            @click="getSkuInfo(row)"
           ></hint-button>
           <el-popconfirm title="确定删除吗？" @onConfirm="deleteSku(row)">
             <hint-button
@@ -90,6 +90,47 @@
       @size-change="handleSizeChange"
     >
     </el-pagination>
+    <!-- 抽屉 -->
+    <el-drawer :visible.sync="drawer" :show-close="false" size="50%">
+      <el-row>
+        <el-col :span="5">名称</el-col>
+        <el-col :span="16">{{ skuInfo.skuName }}</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="5">描述</el-col>
+        <el-col :span="16">{{ skuInfo.skuDesc }}</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="5">价格</el-col>
+        <el-col :span="16">{{ skuInfo.price }}元</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="5">平台属性</el-col>
+        <el-col :span="16">
+          <template>
+            <el-tag
+              type="success"
+              v-for="(attr, index) in skuInfo.skuSaleAttrValueList"
+              :key="attr.id"
+              >{{ attr.saleAttrName }}:{{ attr.saleAttrValueName }}</el-tag
+            >
+          </template>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="5">商品图片</el-col>
+        <el-col :span="16">
+          <el-carousel height="150px">
+            <el-carousel-item
+              v-for="item in skuInfo.skuImageList"
+              :key="item.id"
+            >
+              <img :src="item.imgUrl" style="height: 280px; width: 300px" />
+            </el-carousel-item>
+          </el-carousel>
+        </el-col>
+      </el-row>
+    </el-drawer>
   </div>
 </template>
 
@@ -102,6 +143,8 @@ export default {
       limit: 10, //代表当前页面有几条数据
       records: [], //存储sku列表的数据
       total: 0, //存储分页器一共展示的数据
+      skuInfo: {}, //存储sku详情信息的
+      drawer: false, //抽屉效果的显示与隐藏
     };
   },
   //组件噶在完毕
@@ -147,9 +190,56 @@ export default {
     editSku() {
       this.$message("正在开发中...");
     },
+    //获取SKU详情
+    async getSkuInfo(sku) {
+      this.drawer = true; //抽屉效果显示
+      let result = await this.$API.sku.reqSkuById(sku.id);
+      if (result.code === 200) {
+        this.skuInfo = result.data;
+      }
+    },
   },
 };
 </script>
 
+<style scoped>
+.el-row .el-col-5 {
+  font-size: 18px;
+  text-align: right;
+}
+.el-row .el-col {
+  margin: 10px 10px;
+}
+.el-tag.el-tag--success {
+  margin-left: 10px;
+}
+/* 轮播图样式 start */
+.el-carousel__item h3 {
+  color: #475669;
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 150px;
+  margin: 0;
+}
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+.el-carousel__item:nth-child(2n + 1) {
+  background-color: #d3dce6;
+}
+/* 轮播图样式 end */
+</style>
 <style>
+/* 轮播图下方按钮样式必须放到<style>中才生效：深度选择器 */
+.el-carousel__button {
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+}
+/* 轮播图容器样式 */
+.el-carousel__container {
+  height: 250px !important;
+  width: 300px;
+}
 </style>
