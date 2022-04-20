@@ -40,21 +40,23 @@
             icon="el-icon-top"
             size="mini"
             title="上架sku"
-            @click="addSku(row)"
+            v-if="row.isSale === 0"
+            @click="onSale(row)"
           ></hint-button>
           <hint-button
             type="warning"
             icon="el-icon-bottom"
             size="mini"
-            title="下架su"
-            @click="downSku(row)"
+            title="下架sku"
+            v-else
+            @click="cancelSale(row)"
           ></hint-button>
           <hint-button
             type="primary"
             icon="el-icon-edit"
             size="mini"
             title="修改sku"
-            @click="updateSku(row)"
+            @click="editSku"
           ></hint-button>
           <hint-button
             type="info"
@@ -124,6 +126,26 @@ export default {
       //修改参数
       this.limit = limit;
       this.getSkuList();
+    },
+    //上架
+    async onSale(row) {
+      let result = await this.$API.sku.reqOnSale(row.id);
+      if (result.code === 200) {
+        row.isSale = 1;
+        this.$message.success("上架成功");
+      }
+    },
+    //下架
+    async cancelSale(row) {
+      let result = await this.$API.sku.reqCancelSale(row.id);
+      if (result.code === 200) {
+        row.isSale = 0;
+        this.$message.success("下架成功");
+      }
+    },
+    //编辑
+    editSku() {
+      this.$message("正在开发中...");
     },
   },
 };
