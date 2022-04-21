@@ -198,6 +198,15 @@ export default {
         this.skuInfo = result.data;
       }
     },
+    //删除SKU
+    async deleteSku(sku) {
+      let result = await this.$API.sku.reqDeleteSku(sku.id);
+      if (result.code === 200) {
+        this.$message.success("删除成功");
+        //代表当SKU个数大于1时，删除后停留在当前页；否则跳转到上一页
+        this.getSkuList(this.records.length > 1 ? this.page : this.page - 1);
+      }
+    },
   },
 };
 </script>
