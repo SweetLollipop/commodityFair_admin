@@ -38,6 +38,9 @@
         <el-card>
           <!-- 第三个card -->
           <Detail title="支付笔数" count="88460">
+            <template slot="charts">
+              <barChart></barChart>
+            </template>
             <template slot="footer">
                 <span>转换率65%</span>
             </template>
@@ -48,6 +51,9 @@
         <el-card>
           <!-- 第四个card -->
           <Detail title="运营活动效果" count="78%">
+            <template slot="charts">
+                <progressChart></progressChart>
+            </template>
             <template slot="footer">
               <div class="effect">
                 <span>
@@ -70,11 +76,15 @@
 <script>
 import Detail from "./Detail";
 import lineChart from "./lineChart";
+import barChart from "./barChart";
+import progressChart from "./progressChart";
 export default {
   name: "Card",
   components: {
     Detail,
     lineChart,
+    barChart,
+    progressChart,
   },
 };
 </script>
