@@ -24,6 +24,9 @@ export default {
   computed: {
     ...mapGetters(["name"]),
   },
+  mounted() {
+    this.$store.dispatch('getData');
+  }
 };
 </script>
 

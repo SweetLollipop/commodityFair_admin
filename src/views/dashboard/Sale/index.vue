@@ -82,6 +82,7 @@
 //引入echarts
 import * as echarts from "echarts";
 import dayjs from "dayjs";
+import {mapState} from 'vuex';
 export default {
   name: "Sale",
   data() {
@@ -96,7 +97,10 @@ export default {
     //计算属性-标题
     title() {
       return this.activeName=== "sale" ? "销售额" : "访问量"
-    }
+    },
+    ...mapState({
+      listState:state => state.home.list
+    }),
   },
   mounted() {
     //初始化echarts实例
@@ -121,7 +125,8 @@ export default {
       xAxis: [
         {
           type: "category",
-          data: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+          // data: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+          data: [],
           axisTick: {
             alignWithLabel: true,
           },
@@ -137,11 +142,13 @@ export default {
           name: "Direct",
           type: "bar",
           barWidth: "60%",
-          data: [10, 52, 200, 334, 390, 330, 220, 110, 98, 167, 123, 44],
+          // data: [10, 52, 200, 334, 390, 330, 220, 110, 98, 167, 123, 44],
+          data: [],
           color: "yellowgreen",
         },
       ],
     });
+    //顶部是mounted: 为什么第一次没有数据，没有数据因此不显示
   },
   //监听属性
   watch: {
@@ -151,9 +158,29 @@ export default {
       this.mycharts.setOption({
         title: {
           text: this.title + "趋势",
-        }
+        },
+        xAxis: {
+          data: this.title==="销售额" ? this.listState.orderFullYearAxis : this.listState.userFullYearAxis
+        },
+        series: [
+          {
+            data: this.title==="销售额" ? this.listState.orderFullYear : this.listState.userFullYear
+          }
+        ]
       })
     },
+    listState() {
+      this.mycharts.setOption({
+        xAxis: {
+          data: this.listState.orderFullYearAxis
+        },
+        series: [
+          {
+            data:this.listState.orderFullYear
+          }
+        ]
+      })
+    }
   },
   methods: {
     //今日

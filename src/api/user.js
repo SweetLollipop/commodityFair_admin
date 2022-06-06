@@ -1,9 +1,9 @@
-import request from '@/utils/request'
+import request from '@/utils/mockRequest'
 
 export function login(data) {
   return request({
-    // url: '/vue-admin-template/user/login',
-    url: '/admin/acl/index/login',
+    url: '/vue-admin-template/user/login',
+    // url: '/admin/acl/index/login',
     method: 'post',
     data
   })
@@ -11,8 +11,8 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    // url: '/vue-admin-template/user/info',
-    url: '/admin/acl/index/info',
+    url: '/vue-admin-template/user/info',
+    // url: '/admin/acl/index/info',
     method: 'get',
     params: { token }
   })
@@ -20,8 +20,8 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    // url: '/vue-admin-template/user/logout',
-    url: '/admin/acl/index/logout',
+    url: '/vue-admin-template/user/logout',
+    // url: '/admin/acl/index/logout',
     method: 'post'
   })
 }
