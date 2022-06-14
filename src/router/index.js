@@ -1,8 +1,11 @@
+//引入Vue|Vue-router
 import Vue from 'vue'
 import Router from 'vue-router'
 
+//使用路由插件
 Vue.use(Router)
 
+/*引入最外层骨架的一级路由组件*/
 /* Layout */
 import Layout from '@/layout'
 
@@ -30,6 +33,8 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+//路由的配置：为什么不同用户登录我们的项目，菜单（路由）都是一样的？
+//因为咱们的路由“死的”，不管你是谁，你能看见的，操作的菜单都是一样的
 export const constantRoutes = [
   {
     path: '/login',
@@ -244,6 +249,7 @@ export const constantRoutes = [
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
+  //因为注册的路由是“死的”，“活的”路由如果根据不同用户（角色）可以展示不同菜单
   routes: constantRoutes
 })
 
