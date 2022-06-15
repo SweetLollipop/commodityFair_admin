@@ -13,7 +13,15 @@ const getDefaultState = () => {
     //存储用户名
     name: '',
     //存储用户头像
-    avatar: ''
+    avatar: '',
+    //服务器返回的菜单信息[根据不同的角色：返回的标记信息，数据里面的元素是字符串]
+    routes: [],
+    //角色信息
+    roles: [],
+    //按钮权限的信息
+    buttons: [],
+    //对比之后：[项目已有的异步路由，与服务器返回的标记信息进行对比最终需要展示的路由]
+    resultAsyncRoutes:[],
   }
 }
 
@@ -29,13 +37,26 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  //存储用户名
+  /* //存储用户名
   SET_NAME: (state, name) => {
     state.name = name
   },
   //存储用户头像
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  } */
+  //存储用户信息
+  SET_USERINFO: (state, userInfo) => {
+    //用户名
+    state.name = userInfo.name;
+    //用户头像
+    state.avatar = userInfo.avatar;
+    //菜单权限标记
+    state.routes = userInfo.routes;
+    //按钮权限标记
+    state.buttons = userInfo.buttons;
+    //角色
+    state.roles = userInfo.roles;
   }
 }
 
@@ -67,11 +88,13 @@ const actions = {
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
+        console.log(data);
+        //vuex存储用户的全部信息
+        commit('SET_USERINFO', data);
 
-        const { name, avatar } = data
-
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        // const { name, avatar } = data
+        // commit('SET_NAME', name)
+        // commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
         reject(error)
