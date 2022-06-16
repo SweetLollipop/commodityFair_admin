@@ -25,7 +25,7 @@ export default {
     ...mapGetters(["name"]),
   },
   mounted() {
-    this.$store.dispatch('getData');
+    // this.$store.dispatch('getData');
   }
 };
 </script>

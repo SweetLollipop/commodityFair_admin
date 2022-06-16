@@ -3,7 +3,8 @@ import { login, logout, getInfo } from '@/api/user'
 //获取token|设置token|删除token的函数
 import { getToken, setToken, removeToken } from '@/utils/auth'
 //路由模块当中重置路由的方法
-import { resetRouter } from '@/router'
+import { asyncRoutes, resetRouter, constantRoutes, anyRoutes } from '@/router'
+import router from '@/router'
 
 //箭头函数
 const getDefaultState = () => {
@@ -21,7 +22,9 @@ const getDefaultState = () => {
     //按钮权限的信息
     buttons: [],
     //对比之后：[项目已有的异步路由，与服务器返回的标记信息进行对比最终需要展示的路由]
-    resultAsyncRoutes:[],
+    resultAsyncRoutes: [],
+    //用户最终需要展示的全部路由
+    resultAllRoutes: [],
   }
 }
 
@@ -57,7 +60,31 @@ const mutations = {
     state.buttons = userInfo.buttons;
     //角色
     state.roles = userInfo.roles;
-  }
+  },
+  //最终计算出的异步路由
+  SET_RESULTASYNCROUTES: (state, resultAsyncRoutes) => {
+    //vuex保存当前用户的异步路由
+    state.resultAsyncRoutes = resultAsyncRoutes;
+    //常量路由合并异步路由、任意路由==>所有路由
+    state.resultAllRoutes = constantRoutes.concat(state.resultAsyncRoutes, anyRoutes);
+    //给路由器添加新的路由
+    router.addRoutes(state.resultAllRoutes);
+  },
+}
+
+//定义一个函数：两个数据进行对比，对比出当前用户到底显示哪些异步路由
+const computedAsyncRoutes = (asyncRoutes, routes) => {
+  //过滤出当前用户[超级管理员|普通员工]需要展示的异步路由
+  return asyncRoutes.filter(item => {
+    //数组中没有这个元素返回索引值为-1
+    if(routes.indexOf(item.name) !== -1){
+      //递归:别忘记可能还有2、3、4、5、6级路由
+      if(item.children && item.children.length){
+        item.children = computedAsyncRoutes(item.children, routes);
+      }
+      return true;
+    }
+  })
 }
 
 const actions = {
@@ -88,10 +115,10 @@ const actions = {
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
-        console.log(data);
+        // console.log(data);
         //vuex存储用户的全部信息
         commit('SET_USERINFO', data);
-
+        commit('SET_RESULTASYNCROUTES', computedAsyncRoutes(asyncRoutes, data.routes));
         // const { name, avatar } = data
         // commit('SET_NAME', name)
         // commit('SET_AVATAR', avatar)
@@ -132,4 +159,3 @@ export default {
   mutations,
   actions
 }
-

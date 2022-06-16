@@ -31,7 +31,10 @@ export default {
       'sidebar'
     ]),
     routes() {
-      return this.$router.options.routes
+      //sliderbar: 需要遍历的应该是仓库计算完毕的全部路由
+      return this.$store.state.user.resultAllRoutes
+      //潘家成：遍历惨淡兰的时候，开始遍历的都是常量路由
+      // return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route
