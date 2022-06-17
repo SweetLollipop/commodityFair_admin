@@ -222,17 +222,19 @@ export const asyncRoutes = [
     path: '/product',
     component: Layout,
     name: 'Product',
-    meta: {title: '商品管理', incon: 'el-icon-goods'},
+    meta: {title: '商品管理', icon: 'el-icon-goods'},
     children: [
       {
         path: 'tradeMark',
-        name: 'TradeMark',
+        // name: 'TradeMark',
+        name: 'Trademark',
         component: () => import('@/views/product/tradeMark'),
         meta: { title: '品牌管理' }
       },
       {
         path: 'attribute',
-        name: 'Attribute',
+        // name: 'Attribute',
+        name: 'Attr',
         component: () => import('@/views/product/attribute'),
         meta: { title: '平台属性管理' }
       },
